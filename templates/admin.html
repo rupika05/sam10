@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard 🌸 BloomBox{% endblock %}
+{% block meta_description %}BloomBox Admin Dashboard — Manage songs, upload new tracks and covers.{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header fade-in">
+        <h1 class="scrapbook-title">Admin Dashboard 🛠️</h1>
+        <p style="color:var(--text-muted);margin-top:6px;">Manage the BloomBox music library</p>
+    </div>
+
+    <div class="admin-grid fade-in">
+
+        <!-- Upload New Song Panel -->
+        <div>
+            <div class="admin-panel-card" style="background:var(--peach);border:2px solid var(--text-main);">
+                <h3><i class="fa-solid fa-upload"></i> Upload New Song</h3>
+                <form method="POST" action="{{ url_for('admin') }}" enctype="multipart/form-data" id="upload-song-form">
+                    <input type="hidden" name="action" value="upload">
+
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" for="upload-title">
+                            <i class="fa-solid fa-music"></i> Song Title
+                        </label>
+                        <input type="text"
+                               id="upload-title"
+                               name="title"
+                               class="form-control"
+                               placeholder="e.g. Midnight Memories"
+                               required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" for="upload-desc">
+                            <i class="fa-solid fa-align-left"></i> Description
+                        </label>
+                        <textarea id="upload-desc"
+                                  name="description"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="What memory does this song bring back?…"
+                                  style="resize:vertical;"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label"><i class="fa-solid fa-file-audio"></i> Audio File</label>
+                        <div class="file-input-wrapper">
+                            <label class="file-input-label" for="upload-audio">
+                                <i class="fa-solid fa-upload"></i>
+                                <span class="file-label-text">Choose audio file (mp3, wav…)</span>
+                            </label>
+                            <input type="file" id="upload-audio" name="audio_file" accept=".mp3,.wav,.ogg,.m4a" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:1.25rem;">
+                        <label class="form-label"><i class="fa-solid fa-image"></i> Cover Image</label>
+                        <div class="file-input-wrapper">
+                            <label class="file-input-label" for="upload-cover">
+                                <i class="fa-solid fa-image"></i>
+                                <span class="file-label-text">Choose cover image (png, jpg…)</span>
+                            </label>
+                            <input type="file" id="upload-cover" name="cover_file" accept=".png,.jpg,.jpeg,.webp,.gif" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="upload-submit-btn" style="width:100%;justify-content:center;">
+                        <i class="fa-solid fa-upload"></i> Upload Song
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Songs List Panel -->
+        <div>
+            <div class="admin-panel-card">
+                <h3><i class="fa-solid fa-list-music"></i> All Songs ({{ songs|length }})</h3>
+
+                {% if songs %}
+                    {% for song in songs %}
+                    <div class="admin-song-row" id="admin-song-{{ song.id }}">
+                        <img class="admin-song-cover"
+                             src="{{ url_for('static', filename='uploads/' + song.coverpath) }}"
+                             alt="{{ song.title }}"
+                             onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+
+                        <div class="admin-song-info">
+                            <div class="admin-song-title">{{ song.title }}</div>
+                            <div class="admin-song-paths">
+                                <span><i class="fa-solid fa-file-audio"></i> {{ song.filepath }}</span>
+                                <span><i class="fa-solid fa-image"></i> {{ song.coverpath }}</span>
+                            </div>
+                        </div>
+
+                        <div class="admin-song-actions">
+                            <button class="btn btn-sm btn-outline toggle-edit-form"
+                                    data-song-id="{{ song.id }}"
+                                    title="Edit title/description"
+                                    id="edit-toggle-{{ song.id }}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn btn-sm btn-admin toggle-replace-form"
+                                    data-song-id="{{ song.id }}"
+                                    title="Replace files"
+                                    id="replace-toggle-{{ song.id }}">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </button>
+                            <form method="POST" action="{{ url_for('admin') }}" style="display:inline;"
+                                  onsubmit="return confirm('Delete \'{{ song.title }}\' permanently?')">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="song_id" value="{{ song.id }}">
+                                <button type="submit" class="btn btn-sm" style="background:var(--pastel-pink);" title="Delete" id="delete-btn-{{ song.id }}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Inline Edit Form -->
+                        <div class="admin-sub-form" id="edit-form-{{ song.id }}">
+                            <form method="POST" action="{{ url_for('admin') }}" enctype="multipart/form-data">
+                                <input type="hidden" name="action" value="edit">
+                                <input type="hidden" name="song_id" value="{{ song.id }}">
+                                <div class="admin-inline-group">
+                                    <input type="text" name="title" class="form-control" value="{{ song.title }}" placeholder="Song title" required id="edit-title-{{ song.id }}">
+                                </div>
+                                <div class="admin-inline-group">
+                                    <input type="text" name="description" class="form-control" value="{{ song.description or '' }}" placeholder="Description" id="edit-desc-{{ song.id }}">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary" id="edit-save-{{ song.id }}">
+                                    <i class="fa-solid fa-save"></i> Save
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Inline Replace Files Form -->
+                        <div class="admin-sub-form" id="replace-form-{{ song.id }}">
+                            <form method="POST" action="{{ url_for('admin') }}" enctype="multipart/form-data">
+                                <input type="hidden" name="action" value="replace_files">
+                                <input type="hidden" name="song_id" value="{{ song.id }}">
+                                <div class="file-input-wrapper" style="margin-bottom:8px;">
+                                    <label class="file-input-label" for="replace-audio-{{ song.id }}" style="font-size:0.8rem;padding:5px 10px;">
+                                        <i class="fa-solid fa-file-audio"></i>
+                                        <span class="file-label-text">Replace audio (optional)</span>
+                                    </label>
+                                    <input type="file" id="replace-audio-{{ song.id }}" name="audio_file" accept=".mp3,.wav,.ogg,.m4a">
+                                </div>
+                                <div class="file-input-wrapper" style="margin-bottom:8px;">
+                                    <label class="file-input-label" for="replace-cover-{{ song.id }}" style="font-size:0.8rem;padding:5px 10px;">
+                                        <i class="fa-solid fa-image"></i>
+                                        <span class="file-label-text">Replace cover (optional)</span>
+                                    </label>
+                                    <input type="file" id="replace-cover-{{ song.id }}" name="cover_file" accept=".png,.jpg,.jpeg,.webp,.gif">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-admin" id="replace-save-{{ song.id }}">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Replace Files
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+                    <p style="font-size:2rem;margin-bottom:10px;">🎵</p>
+                    <p>No songs yet! Upload your first song using the form. 🌸</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

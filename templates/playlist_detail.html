@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ playlist.name }} 🎶 BloomBox{% endblock %}
+{% block meta_description %}Listen to the {{ playlist.name }} playlist on BloomBox — your college memory soundtrack.{%
+endblock %}
+
+{% set playlist_id = playlist.id %}
+
+{% block content %}
+<!-- Playlist Header -->
+<div class="playlist-header-container fade-in">
+    <div class="scrapbook-tape mint"></div>
+    <div class="playlist-header-info">
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;">
+            <a href="{{ url_for('playlists') }}" style="color:var(--text-muted);">
+                <i class="fa-solid fa-arrow-left"></i> All Playlists
+            </a>
+        </p>
+        <h1 class="playlist-header-title">{{ playlist.name }}</h1>
+        <p class="playlist-header-desc">
+            {{ playlist_songs|length }} song{{ 's' if playlist_songs|length != 1 else '' }} in this playlist 🌸
+        </p>
+        <div class="playlist-header-actions">
+            {% if playlist_songs %}
+            <button class="btn btn-primary" id="play-all-btn" onclick="playAllPlaylistSongs()">
+                <i class="fa-solid fa-play"></i> Play All
+            </button>
+            {% endif %}
+            <a href="{{ url_for('playlists') }}" class="btn btn-outline">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+    <div class="playlist-header-artwork">
+        {% if playlist_songs %}
+        <div class="polaroid-frame playlist-header-polaroid" style="transform:rotate(-3deg);">
+            <img src="{{ url_for('static', filename='uploads/' + playlist_songs[0].coverpath) }}"
+                alt="{{ playlist.name }}" style="width:140px;height:140px;object-fit:cover;"
+                onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+        </div>
+        {% else %}
+        <div class="polaroid-frame playlist-header-polaroid" style="transform:rotate(-3deg);">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ playlist.name }}"
+                style="width:140px;height:140px;object-fit:contain;">
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Songs in Playlist -->
+<div class="song-list-container fade-in">
+    {% if playlist_songs %}
+    {% for song in playlist_songs %}
+    <div class="song-row" data-song-id="{{ song.id }}" data-title="{{ song.title }}" data-filepath="{{ song.filepath }}"
+        data-coverpath="{{ song.coverpath }}" data-description="{{ song.description or '' }}"
+        id="playlist-song-row-{{ song.id }}">
+        <div class="song-row-number">{{ loop.index }}</div>
+        <img class="song-row-cover" src="{{ url_for('static', filename='uploads/' + song.coverpath) }}"
+            alt="{{ song.title }}" onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+        <div class="song-row-info">
+            <div class="song-row-title">{{ song.title }}</div>
+            <div class="song-row-desc">{{ song.description or '' }}</div>
+        </div>
+        <div class="song-row-actions">
+            <button class="song-row-btn like-btn {% if song.id in liked_song_ids %}liked{% endif %}"
+                data-song-id="{{ song.id }}" title="Like" id="like-btn-pl-{{ song.id }}">
+                <i class="fa-{% if song.id in liked_song_ids %}solid{% else %}regular{% endif %} fa-heart"
+                    style="color:{% if song.id in liked_song_ids %}#ff5e7e{% endif %}"></i>
+            </button>
+            <button class="song-row-btn delete remove-from-playlist-btn" data-song-id="{{ song.id }}"
+                title="Remove from playlist" id="remove-btn-{{ song.id }}">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div style="text-align:center;padding:3rem;color:var(--text-muted);">
+        <p style="font-size:2rem;margin-bottom:10px;">🎵</p>
+        <p style="font-family:var(--font-heading);font-size:1.4rem;">This playlist is empty!</p>
+        <p style="font-size:0.9rem;">Add songs using the section below.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Add Song to Playlist -->
+<div class="add-to-playlist-section fade-in" style="margin-top:2rem;">
+    <div>
+        <p style="font-family:var(--font-heading);font-size:1.3rem;margin-bottom:4px;">
+            <i class="fa-solid fa-plus"></i> Add a song to this playlist
+        </p>
+        <p style="font-size:0.85rem;color:var(--text-muted);">Select a song from the library to add.</p>
+    </div>
+    <div class="add-to-playlist-controls">
+        <select id="add-song-select" class="form-control" style="flex-grow:1;">
+            <option value="">— Select a song —</option>
+            {% for song in all_songs %}
+            <option value="{{ song.id }}">{{ song.title }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary" id="add-song-btn" style="white-space:nowrap;">
+            <i class="fa-solid fa-plus"></i> Add
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Data for "Play All" button
+    const playlistSongs = [
+        {% for song in playlist_songs %}
+    {
+        id: { { song.id } },
+        title: { { song.title | tojson } },
+        filepath: { { song.filepath | tojson } },
+        coverpath: { { song.coverpath | tojson } },
+        description: { { (song.description or '') | tojson } }
+    } {% if not loop.last %}, {% endif %}
+    {% endfor %}
+];
+
+    function playAllPlaylistSongs() {
+        if (playlistSongs.length === 0) return;
+        playSong(playlistSongs[0], playlistSongs);
+    }
+</script>
+{% endblock %}

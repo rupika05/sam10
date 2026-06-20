@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}About BloomBox 🌸 — Where memories bloom into melodies{% endblock %}
+{% block meta_description %}Learn about BloomBox — a cozy, scrapbook-style music platform built to relive beautiful college memories through music.{% endblock %}
+
+{% block content %}
+<div class="about-container">
+
+    <!-- About Header -->
+    <div class="about-header fade-in">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BloomBox Logo" class="about-logo">
+        <h1 style="font-size:3rem;margin-bottom:10px;">About BloomBox 🌸</h1>
+        <p>"Where memories bloom into melodies"</p>
+    </div>
+
+    <div class="scrapbook-layout">
+
+        <!-- Row 1: The Idea -->
+        <div class="scrapbook-row fade-in">
+            <div class="scrapbook-content">
+                <div class="notebook-paper">
+                    <div class="scrapbook-tape pink"></div>
+                    <h3>🌸 The Idea</h3>
+                    <p>
+                        BloomBox was born from a simple thought — <em>what if music could take you back?</em>
+                        Back to the hostel corridors at midnight, the canteen chai sessions, the sports day rush
+                        and the nervousness before stepping onto a cultural stage.
+                    </p>
+                    <p>
+                        College memories are irreplaceable. And every memory deserves a soundtrack.
+                    </p>
+                </div>
+            </div>
+            <div class="scrapbook-photo-container">
+                <div>
+                    <div class="polaroid-frame" style="transform:rotate(-4deg);max-width:160px;">
+                        <img src="{{ url_for('static', filename='uploads/hostel.png') }}"
+                             alt="Hostel Nights"
+                             style="width:136px;height:136px;object-fit:cover;"
+                             onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+                    </div>
+                    <div class="polaroid-caption">Hostel Nights ✨</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Features -->
+        <div class="scrapbook-row reverse fade-in">
+            <div class="scrapbook-content">
+                <div class="notebook-paper">
+                    <div class="scrapbook-tape mint"></div>
+                    <h3>🎵 What BloomBox Offers</h3>
+                    <ul class="features-list">
+                        <li><i class="fa-solid fa-compact-disc"></i> <strong>Music Library</strong> — All your college memory songs in one place.</li>
+                        <li><i class="fa-solid fa-list"></i> <strong>Curated Playlists</strong> — Midnight Hostel, Canteen Vibes, Sports Arena & more.</li>
+                        <li><i class="fa-solid fa-heart"></i> <strong>Liked Songs</strong> — Save your favourites for quick access.</li>
+                        <li><i class="fa-solid fa-shuffle"></i> <strong>Shuffle & Repeat</strong> — Full music player controls.</li>
+                        <li><i class="fa-solid fa-search"></i> <strong>Instant Search</strong> — Find any song or playlist instantly.</li>
+                        <li><i class="fa-solid fa-mobile-alt"></i> <strong>Responsive</strong> — Works perfectly on mobile and desktop.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="scrapbook-photo-container">
+                <div>
+                    <div class="polaroid-frame" style="transform:rotate(3deg);max-width:160px;">
+                        <img src="{{ url_for('static', filename='uploads/cultural.png') }}"
+                             alt="Cultural Nights"
+                             style="width:136px;height:136px;object-fit:cover;"
+                             onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+                    </div>
+                    <div class="polaroid-caption">Cultural Nights 🎭</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Vibes -->
+        <div class="scrapbook-row fade-in">
+            <div class="scrapbook-content">
+                <div class="notebook-paper">
+                    <div class="scrapbook-tape"></div>
+                    <h3>🌿 The Vibe</h3>
+                    <p>
+                        Pastel pinks. Lavenders. Creams. Polaroid frames. Floating petals.
+                        BloomBox is designed to feel like a warm, cosy scrapbook — the kind your
+                        best friend kept in a diary filled with stickers and doodles.
+                    </p>
+                    <p>
+                        Every corner of this app is a little love letter to college life — to
+                        late nights, messy canteens, sports day mud, hostel gossip, and the
+                        friendships that last a lifetime.
+                    </p>
+                </div>
+            </div>
+            <div class="scrapbook-photo-container">
+                <div>
+                    <div class="polaroid-frame" style="transform:rotate(-2deg);max-width:160px;">
+                        <img src="{{ url_for('static', filename='uploads/canteen.png') }}"
+                             alt="Canteen Vibes"
+                             style="width:136px;height:136px;object-fit:cover;"
+                             onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+                    </div>
+                    <div class="polaroid-caption">Canteen Vibes 🍽️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="fade-in" style="text-align:center;padding:2.5rem 0;">
+            <div class="scrapbook-tape pink" style="position:relative;left:50%;transform:translateX(-50%);display:inline-block;margin-bottom:1.5rem;width:80px;height:24px;background:rgba(255,213,205,0.55);"></div>
+            <h2 style="font-size:2.5rem;margin-bottom:12px;">Ready to bloom? 🌸</h2>
+            <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:1.1rem;">
+                Start listening and let the memories wash over you.
+            </p>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                <a href="{{ url_for('library') }}" class="btn btn-primary" id="about-listen-btn">
+                    <i class="fa-solid fa-headphones"></i> Start Listening
+                </a>
+                {% if not session.get('username') %}
+                <a href="{{ url_for('register') }}" class="btn btn-outline" id="about-join-btn">
+                    <i class="fa-solid fa-user-plus"></i> Join BloomBox
+                </a>
+                {% endif %}
+            </div>
+            <div style="margin-top:2rem;font-size:1.8rem;letter-spacing:10px;opacity:0.4;">🌸 🌿 ⭐ 🌷 ☁️ 🎵 💖</div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

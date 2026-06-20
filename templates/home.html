@@ -1,1 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Home 🌸 BloomBox — Where memories bloom into melodies{% endblock %}
+{% block meta_description %}BloomBox Home — Dive into cozy college memories through music. Discover playlists, hostel nights, canteen vibes, and cultural nights.{% endblock %}
 
+{% block content %}
+<!-- ===== HERO BANNER ===== -->
+<section class="hero-banner fade-in">
+    <div class="hero-text">
+        <h1>Welcome to BloomBox 🌸🎵</h1>
+        <p>"Where memories bloom into melodies"</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="{{ url_for('library') }}" class="btn btn-primary" id="hero-listen-btn">
+                <i class="fa-solid fa-play"></i> Start Listening
+            </a>
+            <a href="{{ url_for('playlists') }}" class="btn btn-outline" id="hero-playlist-btn">
+                <i class="fa-solid fa-compact-disc"></i> View Playlists
+            </a>
+        </div>
+    </div>
+    <div class="hero-artwork">
+        <div class="polaroid-frame hero-polaroid" style="transform:rotate(4deg);">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BloomBox Memories" style="width:180px;height:180px;object-fit:contain;">
+            <div style="text-align:center; font-family:var(--font-heading); font-size:1rem; margin-top:8px; color:var(--text-muted);">College Days 🌸</div>
+        </div>
+    </div>
+    <!-- Doodle decorations -->
+    <span class="decoration-doodle doodle-flower-1">🌸</span>
+    <span class="decoration-doodle doodle-cloud-1">☁️</span>
+    <span style="position:absolute;bottom:10px;right:80px;font-size:2.5rem;opacity:0.12;pointer-events:none;">⭐</span>
+    <span style="position:absolute;top:60px;left:40%;font-size:2rem;opacity:0.1;pointer-events:none;">🌿</span>
+</section>
+
+<!-- ===== RECENTLY ADDED ===== -->
+{% if recent_songs %}
+<section class="fade-in" style="margin-bottom:2.5rem;">
+    <h2 class="section-title"><i class="fa-solid fa-sparkles" style="color:var(--pastel-pink-dark)"></i> Recently Added</h2>
+    <div class="songs-grid">
+        {% for song in recent_songs %}
+        <div class="song-card fade-in"
+             data-song-id="{{ song.id }}"
+             data-title="{{ song.title }}"
+             data-filepath="{{ song.filepath }}"
+             data-coverpath="{{ song.coverpath }}"
+             data-description="{{ song.description or '' }}"
+             id="song-card-{{ song.id }}">
+            <div class="song-polaroid">
+                <div class="song-cover-container">
+                    <img class="song-cover-img"
+                         src="{{ url_for('static', filename='uploads/' + song.coverpath) }}"
+                         alt="{{ song.title }}"
+                         onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+                    <div class="song-play-overlay">
+                        <div class="play-icon-btn">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+                <button class="song-like-btn like-btn {% if song.id in liked_song_ids %}liked{% endif %}"
+                        data-song-id="{{ song.id }}"
+                        title="Like song"
+                        id="like-btn-home-{{ song.id }}">
+                    <i class="fa-{% if song.id in liked_song_ids %}solid{% else %}regular{% endif %} fa-heart"></i>
+                </button>
+                <div class="song-info">
+                    <div class="song-title">{{ song.title }}</div>
+                    <div class="song-desc">{{ song.description or '' }}</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== QUICK ACCESS PLAYLISTS ===== -->
+{% if playlists %}
+<section class="fade-in" style="margin-bottom:2.5rem;">
+    <h2 class="section-title"><i class="fa-solid fa-compact-disc" style="color:var(--lavender-hover)"></i> Your Playlists</h2>
+    <div class="playlists-quick-grid">
+        {% set icons = ['🌙', '🍽️', '🏅', '📖', '🎭', '🎒'] %}
+        {% for playlist in playlists %}
+        <a href="{{ url_for('playlist_detail', playlist_id=playlist.id) }}"
+           class="playlist-quick-card fade-in"
+           id="playlist-quick-{{ playlist.id }}">
+            <div class="playlist-icon">
+                <i class="fa-solid fa-compact-disc"></i>
+            </div>
+            <div>
+                <div class="playlist-card-title">{{ playlist.name }}</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== SCRAPBOOK INVITE SECTION ===== -->
+<section class="fade-in" style="position:relative;">
+    <div class="notebook-paper" style="text-align:center; padding:2.5rem 3rem;">
+        <div class="scrapbook-tape pink"></div>
+        <p style="font-family:var(--font-heading);font-size:1.8rem;margin-bottom:12px;">🌸 A place for your memories 🌸</p>
+        <p style="color:var(--text-muted);font-size:1rem;line-height:1.8;max-width:600px;margin:0 auto 1.5rem;">
+            From midnight hostel study sessions to canteen chai breaks, from sports day victories to cultural stage performances —
+            every college memory has a melody. Let BloomBox be the soundtrack to your nostalgia.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            {% if not session.get('username') %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary" id="home-join-btn">
+                <i class="fa-solid fa-user-plus"></i> Join BloomBox
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline" id="home-login-btn">
+                <i class="fa-solid fa-sign-in-alt"></i> Login
+            </a>
+            {% else %}
+            <a href="{{ url_for('library') }}" class="btn btn-primary" id="home-explore-btn">
+                <i class="fa-solid fa-headphones"></i> Explore All Songs
+            </a>
+            {% endif %}
+        </div>
+        <div style="margin-top:1.5rem;font-size:2rem;letter-spacing:8px;opacity:0.5;">🌸 🌿 ⭐ 🌷 ☁️ 🎵</div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BloomBox 🌸 Where memories bloom into melodies{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}BloomBox — A cozy, scrapbook-style music streaming platform where college memories bloom into melodies.{% endblock %}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@400;500;700&family=Sofia&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    {% block head_extra %}{% endblock %}
+</head>
+<body data-page="{{ active_page }}" {% if active_page == 'playlist_detail' %}data-playlist-id="{{ playlist_id | default('') }}"{% endif %}>
+
+    <!-- Floating Petals Container -->
+    <div id="petals-container"></div>
+
+    <!-- ===== NAVBAR (Desktop: Left Sidebar | Mobile: Top Bar) ===== -->
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="{{ url_for('home') }}" class="nav-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BloomBox Logo" class="logo-img">
+                <span class="logo-text">BloomBox <span class="sakura">🌸</span></span>
+            </a>
+        </div>
+
+        <div class="nav-center">
+            <div class="search-container">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" id="global-search" placeholder="Search songs, playlists…" autocomplete="off">
+                <div id="search-results-dropdown" class="search-dropdown hidden"></div>
+            </div>
+        </div>
+
+        <nav class="nav-right" id="desktop-nav">
+            <a href="{{ url_for('home') }}" class="nav-link {% if active_page == 'home' %}active{% endif %}" id="nav-home">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+            <a href="{{ url_for('library') }}" class="nav-link {% if active_page == 'library' %}active{% endif %}" id="nav-library">
+                <i class="fa-solid fa-music"></i> Library
+            </a>
+            <a href="{{ url_for('playlists') }}" class="nav-link {% if active_page == 'playlists' %}active{% endif %}" id="nav-playlists">
+                <i class="fa-solid fa-compact-disc"></i> Playlists
+            </a>
+            <a href="{{ url_for('liked') }}" class="nav-link {% if active_page == 'liked' %}active{% endif %}" id="nav-liked">
+                <i class="fa-solid fa-heart"></i> Liked Songs
+            </a>
+            <a href="{{ url_for('about') }}" class="nav-link {% if active_page == 'about' %}active{% endif %}" id="nav-about">
+                <i class="fa-solid fa-circle-info"></i> About
+            </a>
+
+            {% if session.get('username') %}
+                <div class="user-menu">
+                    <span class="username-display">Hi, {{ session['username'] }}! 🌸</span>
+                    {% if session.get('is_admin') %}
+                        <a href="{{ url_for('admin') }}" class="btn btn-sm btn-admin" id="nav-admin">
+                            <i class="fa-solid fa-user-gear"></i> Admin
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline" id="nav-logout">
+                        <i class="fa-solid fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            {% else %}
+                <div class="auth-buttons">
+                    <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline" id="nav-login">
+                        <i class="fa-solid fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary" id="nav-register">
+                        <i class="fa-solid fa-user-plus"></i> Join
+                    </a>
+                </div>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- ===== MOBILE BOTTOM NAVIGATION BAR ===== -->
+    <nav class="mobile-bottom-nav" id="mobile-nav">
+        <a href="{{ url_for('home') }}" class="mobile-bottom-nav-link {% if active_page == 'home' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('library') }}" class="mobile-bottom-nav-link {% if active_page == 'library' %}active{% endif %}">
+            <i class="fa-solid fa-music"></i>
+            <span>Library</span>
+        </a>
+        <a href="{{ url_for('playlists') }}" class="mobile-bottom-nav-link {% if active_page == 'playlists' %}active{% endif %}">
+            <i class="fa-solid fa-compact-disc"></i>
+            <span>Playlists</span>
+        </a>
+        <a href="{{ url_for('liked') }}" class="mobile-bottom-nav-link {% if active_page == 'liked' %}active{% endif %}">
+            <i class="fa-solid fa-heart"></i>
+            <span>Liked</span>
+        </a>
+        {% if session.get('username') %}
+        <a href="{{ url_for('logout') }}" class="mobile-bottom-nav-link">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="mobile-bottom-nav-link {% if active_page == 'login' %}active{% endif %}">
+            <i class="fa-solid fa-sign-in-alt"></i>
+            <span>Login</span>
+        </a>
+        {% endif %}
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BloomBox Logo" class="footer-logo-img">
+                <h3>BloomBox 🌸🎵</h3>
+                <p class="tagline">"Where memories bloom into melodies"</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('library') }}">Library</a>
+                <a href="{{ url_for('playlists') }}">Playlists</a>
+                <a href="{{ url_for('liked') }}">Liked Songs</a>
+                <a href="{{ url_for('about') }}">About BloomBox</a>
+            </div>
+            <div class="footer-doodle">
+                <p>🌸 ✨ 🎵 🌿 ⭐ 🌷</p>
+                <p>&copy; 2026 BloomBox. Handcrafted with 🌸 and 💖 for college memories.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== STICKY BOTTOM MUSIC PLAYER ===== -->
+    <div id="sticky-player" class="music-player-bar hidden">
+        <div class="player-container">
+            <!-- Left: Song Info -->
+            <div class="player-song-info">
+                <div class="player-polaroid">
+                    <img id="player-cover" src="{{ url_for('static', filename='images/logo.png') }}" alt="Cover">
+                </div>
+                <div class="player-text">
+                    <div id="player-title" class="player-song-title">Select a song to play</div>
+                    <div id="player-description" class="player-song-desc">Enjoy your memories 🌸</div>
+                </div>
+            </div>
+
+            <!-- Center: Controls & Progress -->
+            <div class="player-controls-container">
+                <div class="player-buttons">
+                    <button id="player-shuffle" class="player-btn" title="Shuffle">
+                        <i class="fa-solid fa-shuffle"></i>
+                    </button>
+                    <button id="player-prev" class="player-btn" title="Previous">
+                        <i class="fa-solid fa-backward-step"></i>
+                    </button>
+                    <button id="player-play" class="player-play-btn" title="Play/Pause">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button id="player-next" class="player-btn" title="Next">
+                        <i class="fa-solid fa-forward-step"></i>
+                    </button>
+                    <button id="player-repeat" class="player-btn" title="Repeat">
+                        <i class="fa-solid fa-repeat"></i>
+                    </button>
+                </div>
+                <div class="player-progress-bar">
+                    <span id="player-current-time" class="time">0:00</span>
+                    <div class="progress-slider-container">
+                        <input type="range" id="progress-slider" min="0" max="100" value="0" step="0.1">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="player-total-time" class="time">0:00</span>
+                </div>
+            </div>
+
+            <!-- Right: Like & Volume -->
+            <div class="player-secondary-controls">
+                <button id="player-like" class="player-btn like-btn-player" title="Like Song">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+                <div class="volume-container">
+                    <i id="volume-icon" class="fa-solid fa-volume-high" style="cursor:pointer"></i>
+                    <input type="range" id="volume-slider" min="0" max="100" value="80">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="main-audio" preload="metadata"></audio>
+
+    <!-- Pass liked song IDs to JavaScript -->
+    <script>
+        window.LIKED_SONG_IDS = {{ liked_song_ids | tojson }};
+    </script>
+
+    <!-- Main JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Music Library 🎵 BloomBox{% endblock %}
+{% block meta_description %}Browse every song in the BloomBox library. College memories, hostel nights, canteen vibes and more.{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:2rem;" class="fade-in">
+    <h1 class="scrapbook-title">Music Library 🎵</h1>
+    <p style="color:var(--text-muted);margin-top:8px;font-size:1rem;">
+        {{ songs|length }} songs • Click any card to play 🌸
+    </p>
+</div>
+
+{% if songs %}
+<div class="songs-grid">
+    {% for song in songs %}
+    <div class="song-card fade-in"
+         data-song-id="{{ song.id }}"
+         data-title="{{ song.title }}"
+         data-filepath="{{ song.filepath }}"
+         data-coverpath="{{ song.coverpath }}"
+         data-description="{{ song.description or '' }}"
+         id="song-card-{{ song.id }}"
+         style="animation-delay: {{ loop.index0 * 0.07 }}s">
+        <div class="song-polaroid">
+            <div class="song-cover-container">
+                <img class="song-cover-img"
+                     src="{{ url_for('static', filename='uploads/' + song.coverpath) }}"
+                     alt="{{ song.title }}"
+                     onerror="this.src='{{ url_for('static', filename='images/logo.png') }}'">
+                <div class="song-play-overlay">
+                    <div class="play-icon-btn">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                </div>
+            </div>
+            <button class="song-like-btn like-btn {% if song.id in liked_song_ids %}liked{% endif %}"
+                    data-song-id="{{ song.id }}"
+                    title="Like this song"
+                    id="like-btn-lib-{{ song.id }}">
+                <i class="fa-{% if song.id in liked_song_ids %}solid{% else %}regular{% endif %} fa-heart"></i>
+            </button>
+            <div class="song-info">
+                <div class="song-title">{{ song.title }}</div>
+                <div class="song-desc">{{ song.description or '' }}</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="notebook-paper" style="text-align:center; padding:3rem;">
+    <div class="scrapbook-tape"></div>
+    <p style="font-size:3rem;margin-bottom:1rem;">🎵</p>
+    <h2 style="font-size:2rem;margin-bottom:10px;">The library is empty!</h2>
+    <p style="color:var(--text-muted);">
+        {% if session.get('is_admin') %}
+        Head to the <a href="{{ url_for('admin') }}" style="font-weight:bold;text-decoration:underline;">Admin panel</a> to upload some songs.
+        {% else %}
+        Songs will appear here once they are added. Check back soon! 🌸
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+{% endblock %}

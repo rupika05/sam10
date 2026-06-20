@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Login 🌸 BloomBox{% endblock %}
+{% block meta_description %}Log in to BloomBox to like songs, create playlists and relive your college memories.{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="notebook-paper auth-card fade-in">
+        <div class="scrapbook-tape pink"></div>
+
+        <div class="auth-header-text">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BloomBox Logo" class="auth-logo">
+            <h2>Welcome Back! 🌸</h2>
+            <p>Log in to your BloomBox account</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label class="form-label" for="login-username">
+                    <i class="fa-solid fa-user"></i> Username
+                </label>
+                <input type="text"
+                       id="login-username"
+                       name="username"
+                       class="form-control"
+                       placeholder="Enter your username…"
+                       required
+                       autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="login-password">
+                    <i class="fa-solid fa-lock"></i> Password
+                </label>
+                <input type="password"
+                       id="login-password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Enter your password…"
+                       required
+                       autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit-btn" id="login-submit-btn">
+                <i class="fa-solid fa-sign-in-alt"></i> Login to BloomBox
+            </button>
+        </form>
+
+        <p class="auth-footer">
+            New to BloomBox? <a href="{{ url_for('register') }}">Join for free 🌸</a>
+        </p>
+
+        <div style="text-align:center;margin-top:1.5rem;font-size:0.8rem;color:var(--text-muted);">
+            <p>Default admin: <strong>admin</strong> / <strong>admin123</strong></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

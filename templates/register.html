@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Join BloomBox 🌸 — Create Account{% endblock %}
+{% block meta_description %}Create your free BloomBox account to like songs, manage playlists and relive college memories.{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="notebook-paper auth-card fade-in">
+        <div class="scrapbook-tape"></div>
+
+        <div class="auth-header-text">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BloomBox Logo" class="auth-logo">
+            <h2>Join BloomBox! 🌸</h2>
+            <p>Create your free account and start blooming</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label class="form-label" for="register-username">
+                    <i class="fa-solid fa-user"></i> Username
+                </label>
+                <input type="text"
+                       id="register-username"
+                       name="username"
+                       class="form-control"
+                       placeholder="Choose a cute username…"
+                       required
+                       minlength="3"
+                       maxlength="30"
+                       autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="register-password">
+                    <i class="fa-solid fa-lock"></i> Password
+                </label>
+                <input type="password"
+                       id="register-password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Create a password…"
+                       required
+                       minlength="6"
+                       autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit-btn" id="register-submit-btn">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account? <a href="{{ url_for('login') }}">Log in 🌸</a>
+        </p>
+
+        <div style="text-align:center;margin-top:1.5rem;font-size:1.5rem;letter-spacing:8px;opacity:0.4;">
+            🌸 🌿 ⭐ 🌷
+        </div>
+    </div>
+</div>
+{% endblock %}

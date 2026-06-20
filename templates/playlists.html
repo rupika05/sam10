@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Playlists 🎶 BloomBox{% endblock %}
+{% block meta_description %}Explore all BloomBox playlists — Midnight Hostel, Canteen Vibes, Sports Arena, Lecture Break, Cultural Nights and Bunk Diaries.{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:2rem;" class="fade-in">
+    <h1 class="scrapbook-title">Playlists 🎶</h1>
+    <p style="color:var(--text-muted);margin-top:8px;font-size:1rem;">{{ playlists|length }} curated college memory playlists 🌸</p>
+</div>
+
+{% if playlists %}
+<div class="playlists-page-grid">
+    {% set icons = ['fa-moon', 'fa-utensils', 'fa-trophy', 'fa-book-open', 'fa-masks-theater', 'fa-bag-shopping'] %}
+    {% set emojis = ['🌙', '🍽️', '🏅', '📖', '🎭', '🎒'] %}
+    {% set descriptions = [
+        'Late-night hostel sessions, midnight tea and unforgettable friendships.',
+        'Canteen breaks, campus snacks, gossip and warm memories.',
+        'Sports day cheers, teamwork, victories and ground-level moments.',
+        'Classroom laughs, passing notes and the art of surviving lectures.',
+        'Stage performances, dance, music and unforgettable cultural nights.',
+        'Bunking class, rooftop plans and those spontaneous college adventures.'
+    ] %}
+
+    {% for playlist in playlists %}
+    <a href="{{ url_for('playlist_detail', playlist_id=playlist.id) }}"
+       class="playlist-card fade-in"
+       id="playlist-card-{{ playlist.id }}"
+       style="animation-delay:{{ loop.index0 * 0.1 }}s; text-decoration:none; color:inherit;">
+        <div class="scrapbook-tape {% if loop.index % 2 == 0 %}pink{% elif loop.index % 3 == 0 %}mint{% endif %}"></div>
+        <div class="playlist-card-header">
+            <div>
+                <span style="font-size:2.2rem;">{{ emojis[loop.index0] if loop.index0 < emojis|length else '🎵' }}</span>
+            </div>
+            <i class="fa-solid {{ icons[loop.index0] if loop.index0 < icons|length else 'fa-music' }}" style="font-size:1.4rem;opacity:0.5;"></i>
+        </div>
+        <div class="playlist-card-info">
+            <h3>{{ playlist.name }}</h3>
+            <p class="playlist-card-desc">
+                {{ descriptions[loop.index0] if loop.index0 < descriptions|length else 'A collection of memories.' }}
+            </p>
+        </div>
+        <div class="playlist-card-meta">
+            <span>{{ playlist.song_count }} song{{ 's' if playlist.song_count != 1 else '' }}</span>
+            <span style="font-size:0.9rem;color:var(--text-muted);">Open <i class="fa-solid fa-arrow-right" style="font-size:0.75rem;"></i></span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="notebook-paper" style="text-align:center;padding:3rem;">
+    <div class="scrapbook-tape pink"></div>
+    <p style="font-size:3rem;margin-bottom:1rem;">🎶</p>
+    <h2>No playlists yet!</h2>
+    <p style="color:var(--text-muted);">Playlists will appear here. Check back soon! 🌸</p>
+</div>
+{% endif %}
+{% endblock %}
